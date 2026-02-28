@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ваш трекер привычек</title>
+    <!-- Подключаем шрифт Inter для современного чистого вида -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <style>
+        /* Сбрасываем стили и задаём переменные */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.5;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* Тёмная тема */
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Шапка с заголовком и кнопками */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* Кнопки управления */
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-button {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark .icon-button {
+            border-color: #334155;
+        }
+
+        .icon-button:hover {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Карточка добавления привычки */
+        .add-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        body.dark .add-card {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-card h2 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #3b82f6;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        body.dark input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Кнопка отправки */
+        .submit-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-button:hover:not(:disabled) {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Панель сортировки и фильтров */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: white;
+            padding: 6px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+        }
+
+        body.dark .filter-group {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .filter-button {
+            background: none;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 32px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark .filter-button {
+            color: #94a3b8;
+        }
+
+        .filter-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .select {
+            padding: 8px 32px 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+        }
+
+        body.dark .select {
+            background: #1e293b;
+            border-color: #4b5565;
+            color: #f1f5f9;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+        }
+
+        /* Список привычек */
+        .habits-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .habit-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            animation: slideIn 0.3s ease;
+        }
+
+        body.dark .habit-item {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .habit-item:hover {
+            border-color: #3b82f6;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .habit-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        body.dark .habit-description {
+            color: #94a3b8;
+        }
+
+        .habit-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .streak {
+            color: #f59e0b;
+            font-weight: 500;
+        }
+
+        .established-badge {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-button.small {
+            padding: 8px 14px;
+            font-size: 0.9rem;
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e2e8f0;
+        }
+
+        body.dark .empty-state {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        /* Лоадер */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        body.dark .loader {
+            border-color: #334155;
+            border-top-color: #3b82f6;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 640px) {
+            .habit-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .habit-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <h1>Ваши привычки</h1>
+            <div class="header-actions">
+                <button class="icon-button" id="themeToggle" title="Сменить тему">
+                    <span>🌙</span> Тема
+                </button>
+                <button class="icon-button" id="logout">
+                    <span>→</span> Выйти
+                </button>
+            </div>
+        </div>
+
+        <!-- Карточка добавления -->
+        <div class="add-card">
+            <h2>Новая привычка</h2>
+            <form id="habit-form">
+                <div class="form-group">
+                    <input type="text" id="title" placeholder="Название привычки" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="description" placeholder="Описание (необязательно)">
+                </div>
+                <button type="submit" class="submit-button" id="submitHabit">
+                    <span>+</span> Добавить привычку
+                </button>
+            </form>
+        </div>
+
+        <!-- Управление сортировкой и фильтрами -->
+        <div class="controls">
+            <div class="filter-group">
+                <button class="filter-button" data-filter="all">Все</button>
+                <button class="filter-button" data-filter="active">Активные</button>
+                <button class="filter-button" data-filter="established">Выработанные</button>
+            </div>
+            <select class="select" id="sortBy">
+                <option value="streak">По силе привычки</option>
+                <option value="title">По названию</option>
+                <option value="created">По дате</option>
+            </select>
+            <select class="select" id="sortOrder">
+                <option value="desc">По убыванию</option>
+                <option value="asc">По возрастанию</option>
+            </select>
+        </div>
+
+        <!-- Список привычек -->
+        <ul id="habits-list" class="habits-list"></ul>
+    </div>
+
+    <script>
+        // Жёсткая проверка перед любым действием
+    (async () => {
+        if (!token) {
+            window.location.replace('/static/login-page.html');
+            return;
+        }
+    
+        try {
+            const res = await fetch('/habits/?limit=1', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                localStorage.removeItem('access_token');
+                window.location.replace('/static/login-page.html');
+            }
+        } catch {
+        // Ошибка сети — ничего не делаем, возможно сервер не запущен
+        }
+    })();
+        // ==================== НАСТРОЙКИ ====================
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/static/login-page.html';
+        }
+
+        // Состояние
+        let currentFilter = localStorage.getItem('habitFilter') || 'all';
+        let currentSortBy = localStorage.getItem('habitSortBy') || 'streak';
+        let currentSortOrder = localStorage.getItem('habitSortOrder') || 'desc';
+
+        // ==================== ТЕМА ====================
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Загружаем сохранённую тему
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<span>☀️</span> Светлая';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<span>☀️</span> Светлая' : '<span>🌙</span> Тёмная';
+        });
+
+        // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+        async function authFetch(url, options = {}) {
+            options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await fetch(url, options);
+        if (response.status === 401) {
+        // Токен недействителен — удаляем и отправляем на страницу входа
+            localStorage.removeItem('access_token');
+            window.location.href = '/static/login-page.html';
+        // Бросаем ошибку, чтобы прервать выполнение текущего кода
+            throw new Error('Unauthorized');
+        }
+        return response;
+    }
+
+        // ==================== ЗАГРУЗКА ПРИВЫЧЕК ====================
+        async function loadHabits() {
+            const list = document.getElementById('habits-list');
+            list.innerHTML = '<div class="loader"></div>';
+
+            try {
+                const url = `/habits/?sort_by=${currentSortBy}&order=${currentSortOrder}&filter_by=${currentFilter}`;
+                const res = await authFetch(url);
+                const habits = await res.json();
+
+                if (habits.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <p>У Вас пока нет привычек</p>
+                            <p style="font-size: 0.9rem; margin-top: 12px;">Создайте первую, используя форму выше</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = habits.map(habit => `
+                    <li class="habit-item">
+                        <div class="habit-info">
+                            <div class="habit-title">${habit.title}</div>
+                            ${habit.description ? `<div class="habit-description">${habit.description}</div>` : ''}
+                            <div class="habit-meta">
+                                <span class="streak">🔥 ${habit.streak || 0} дней</span>
+                                ${habit.established ? '<span class="established-badge">Выработана</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="habit-actions">
+                            <button class="icon-button small log-btn" data-id="${habit.id}">Отметить</button>
+                            <button class="icon-button small delete-btn" data-id="${habit.id}">Удалить</button>
+                        </div>
+                    </li>
+                `).join('');
+
+                attachEventHandlers();
+            } catch (error) {
+                list.innerHTML = '<div class="empty-state">Ошибка загрузки. Попробуйте обновить страницу.</div>';
+            }
+        }
+
+        // ==================== ОБРАБОТЧИКИ ====================
+        function attachEventHandlers() {
+            // Кнопки отметки
+            document.querySelectorAll('.log-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const button = e.currentTarget;
+                    const id = button.dataset.id;
+                    button.disabled = true;
+                    try {
+                        const res = await authFetch(`/habits/${id}/log`, { method: 'POST' });
+                        if (res.ok) {
+                            await loadHabits();
+                        } else {
+                            const data = await res.json();
+                            alert(data.detail || 'Ошибка');
+                        }
+                    } catch (error) {
+                        alert('Ошибка сети');
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+            });
+
+            // Кнопки удаления
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (!confirm('Удалить привычку?')) return;
+                    const button = e.currentTarget;
+                    const id = button.dataset.id;
+                    button.disabled = true;
+                    try {
+                        const res = await authFetch(`/habits/${id}`, { method: 'DELETE' });
+                        if (res.ok) {
+                            await loadHabits();
+                        } else {
+                            const data = await res.json();
+                            alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                        }
+                    } catch (error) {
+                        alert('Ошибка сети');
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+            });
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        document.getElementById('habit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            if (!title) return;
+
+            const button = document.getElementById('submitHabit');
+            button.disabled = true;
+            try {
+                const res = await authFetch('/habits/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description: description || undefined })
+                });
+                if (res.ok) {
+                    document.getElementById('title').value = '';
+                    document.getElementById('description').value = '';
+                    await loadHabits();
+                }
+            } finally {
+                button.disabled = false;
+            }
+        });
+        // Проверка валидности токена
+    authFetch('/habits/?limit=0')
+        .catch(() => {}) // ошибка уже обработана внутри authFetch, редирект произойдёт
+        .then(() => {
+        // если всё ок, загружаем привычки
+            loadHabits();
+        });
+
+        // Фильтры
+        document.querySelectorAll('.filter-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFilter = btn.dataset.filter;
+                localStorage.setItem('habitFilter', currentFilter);
+                updateFilterButtons();
+                loadHabits();
+            });
+        });
+
+        // Сортировка
+        document.getElementById('sortBy').addEventListener('change', (e) => {
+            currentSortBy = e.target.value;
+            localStorage.setItem('habitSortBy', currentSortBy);
+            loadHabits();
+        });
+
+        document.getElementById('sortOrder').addEventListener('change', (e) => {
+            currentSortOrder = e.target.value;
+            localStorage.setItem('habitSortOrder', currentSortOrder);
+            loadHabits();
+        });
+
+        // Выход
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('access_token');
+            window.location.href = '/static/login-page.html';
+        });
+
+        // Восстанавливаем сохранённые значения
+        document.getElementById('sortBy').value = currentSortBy;
+        document.getElementById('sortOrder').value = currentSortOrder;
+        updateFilterButtons();
+
+        // Старт
+        loadHabits();
+window.addEventListener('pageshow', function(event) {
+    // Если страница загружена из кеша (bfcache)
+    if (event.persisted) {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.replace('/static/login-page.html');
+            return;
+        }
+        
+        // Дополнительная проверка на сервере
+        authFetch('/habits/?limit=1')
+            .then(res => {
+                if (!res.ok) window.location.replace('/static/login-page.html');
+            })
+            .catch(() => window.location.replace('/static/login-page.html'));
+    }
+});
+
+// Также проверяем при загрузке страницы
+window.addEventListener('load', function() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.replace('/static/login-page.html');
+    }
+});
+document.getElementById('logout').addEventListener('click', () => {
+    localStorage.removeItem('access_token');
+    window.location.href = '/static/landing.html';
+});
+    </script>
+</body>
+</html>

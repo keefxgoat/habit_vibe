@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Тёмная тема (по умолчанию) */
+        body.dark {
+            background: linear-gradient(135deg, #1e2b3f, #0f1a2b);
+            color: #e0e0e0;
+        }
+
+        body.dark .register-card {
+            background: rgba(30, 35, 45, 0.9);
+            border: 1px solid #3a4455;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark input {
+            background: #252e3b;
+            border-color: #3a4455;
+            color: #f0f0f0;
+        }
+
+        body.dark input:focus {
+            border-color: #6d8aff;
+            box-shadow: 0 0 0 3px rgba(109, 138, 255, 0.2);
+        }
+
+        body.dark button {
+            background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+        }
+
+        body.dark button:hover {
+            background: linear-gradient(135deg, #5b7aff, #4a6cf7);
+        }
+
+        body.dark .theme-toggle {
+            background: #252e3b;
+            border-color: #3a4455;
+        }
+
+        body.dark .theme-toggle:hover {
+            background: #2f3a4a;
+        }
+
+        body.dark .emoji-bubble {
+            background: #2f3a4a;
+            color: #ffd966;
+        }
+
+        /* Светлая тема */
+        body.light {
+            background: linear-gradient(135deg, #f0f4ff, #d9e2fa);
+            color: #1e2b3f;
+        }
+
+        body.light .register-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #d0d9f0;
+            box-shadow: 0 15px 35px rgba(0, 20, 50, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        body.light input {
+            background: white;
+            border-color: #d0d9f0;
+            color: #1e2b3f;
+        }
+
+        body.light input:focus {
+            border-color: #4a6cf7;
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
+        }
+
+        body.light button {
+            background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+            color: white;
+        }
+
+        body.light button:hover {
+            background: linear-gradient(135deg, #5b7aff, #4a6cf7);
+            box-shadow: 0 10px 20px rgba(74, 108, 247, 0.3);
+        }
+
+        body.light .theme-toggle {
+            background: white;
+            border-color: #d0d9f0;
+            color: #4a6cf7;
+        }
+
+        body.light .theme-toggle:hover {
+            background: #f0f4ff;
+        }
+
+        body.light .emoji-bubble {
+            background: white;
+            color: #ff8800;
+            border: 1px solid #ffaa00;
+        }
+
+        /* Контейнер */
+        .register-card {
+            max-width: 400px;
+            width: 100%;
+            padding: 40px 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        h1 span {
+            display: inline-block;
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+
+        /* Поля ввода с иконками */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border-radius: 15px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            bottom: 15px;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Интерактивная кнопка */
+        .register-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Эффект пульсации при клике */
+        .register-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .register-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        /* Переключатель темы */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid;
+            transition: all 0.3s;
+            background: inherit;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        /* Эмодзи-подсказка */
+        .emoji-bubble {
+            position: absolute;
+            bottom: -20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            animation: float 3s infinite ease-in-out;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Ссылка на вход */
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed;
+            transition: opacity 0.2s;
+        }
+
+        .login-link a:hover {
+            opacity: 0.7;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div class="register-card">
+        <!-- Переключатель темы -->
+        <div class="theme-toggle" id="themeToggle" title="Сменить тему">
+            🌓
+        </div>
+
+        <h1>
+            <span>🔆</span> Привет! <span>👋</span>
+        </h1>
+
+        <!-- Форма -->
+        <div class="input-group">
+            <label>👤 Имя пользователя</label>
+            <span class="input-icon">👤</span>
+            <input type="text" placeholder="Введите имя пользователя" id="username">
+        </div>
+
+        <div class="input-group">
+            <label>📧 Email</label>
+            <span class="input-icon">📧</span>
+            <input type="email" placeholder="hello@gmail.com" id="email">
+        </div>
+
+        <div class="input-group">
+            <label>🔒 Пароль</label>
+            <span class="input-icon">🔒</span>
+            <input type="password" placeholder="Введите пароль" id="password">
+        </div>
+
+        <!-- Кнопка с анимацией -->
+        <button class="register-btn" id="registerBtn">
+            ✨ Зажечь ✨
+        </button>
+
+        <!-- Эмодзи-подсказка (появляется при наведении) -->
+        <div class="emoji-bubble" id="emojiBubble">
+            💡 Ты почти у цели!
+        </div>
+
+        <div class="login-link">
+            Уже есть аккаунт? <a href="#">Войти</a>
+        </div>
+    </div>
+
+    <script>
+        // Переключение темы
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                themeToggle.textContent = '🌞';
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                themeToggle.textContent = '🌓';
+            }
+        });
+
+        // Интерактив с эмодзи
+        const registerBtn = document.getElementById('registerBtn');
+        const emojiBubble = document.getElementById('emojiBubble');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // Меняем подсказку при фокусе на полях
+        usernameInput.addEventListener('focus', () => {
+            emojiBubble.textContent = 'Придумайте юзернейм';
+        });
+
+        emailInput.addEventListener('focus', () => {
+            emojiBubble.textContent = '📧 Настоящий email, обещаем не спамить';
+        });
+
+        passwordInput.addEventListener('focus', () => {
+            emojiBubble.textContent = '🔒 Не меньше 8 символов';
+        });
+
+        // Возвращаем подсказку при потере фокуса
+        [usernameInput, emailInput, passwordInput].forEach(input => {
+            input.addEventListener('blur', () => {
+                emojiBubble.textContent = '💡 Ты почти у цели!';
+            });
+        });
+
+        // Анимация кнопки и "регистрация"
+        registerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Простейшая валидация
+            if (!usernameInput.value || !emailInput.value || !passwordInput.value) {
+                emojiBubble.style.color = '#ff6b6b';
+                setTimeout(() => {
+                    emojiBubble.textContent = '💡 Ты почти у цели!';
+                    emojiBubble.style.color = '';
+                }, 2000);
+                return;
+            }
+
+            // Успех
+            registerBtn.textContent = '✅ Успех!';
+            emojiBubble.textContent = '🎉 Добро пожаловать!';
+            
+            setTimeout(() => {
+                registerBtn.textContent = '✨ Зажечь ✨';
+                emojiBubble.textContent = '💡 Ты почти у цели!';
+            }, 2000);
+
+            // Здесь можно добавить отправку на сервер
+            console.log('Регистрация:', {
+                username: usernameInput.value,
+                email: emailInput.value,
+                password: passwordInput.value
+            });
+        });
+
+        // Эффект при наведении на кнопку
+        registerBtn.addEventListener('mouseenter', () => {
+            emojiBubble.textContent = '⚡ Жми уже!';
+        });
+
+        registerBtn.addEventListener('mouseleave', () => {
+            emojiBubble.textContent = '💡 Ты почти у цели!';
+        });
+    </script>
+</body>
+</html>

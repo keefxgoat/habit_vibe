@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker — твой помощник в формировании привычек</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Светлая тема (по умолчанию) */
+        body.light {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        body.light .navbar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        body.light .feature-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+
+        body.light .feature-card p {
+            color: #64748b;
+        }
+
+        body.light .footer {
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        /* Тёмная тема */
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        body.dark .navbar {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+        }
+
+        body.dark .logo {
+            color: #60a5fa;
+        }
+
+        body.dark .nav-button.login {
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+
+        body.dark .nav-button.login:hover {
+            background: #60a5fa;
+            color: #0f172a;
+        }
+
+        body.dark .nav-button.register {
+            background: #60a5fa;
+            color: #0f172a;
+        }
+
+        body.dark .nav-button.register:hover {
+            background: #3b82f6;
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+        }
+
+        body.dark .hero h1 {
+            color: #f1f5f9;
+        }
+
+        body.dark .hero p {
+            color: #94a3b8;
+        }
+
+        body.dark .hero-button.secondary {
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+
+        body.dark .hero-button.secondary:hover {
+            background: #1e293b;
+        }
+
+        body.dark .hero-image {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+
+        body.dark .feature-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark .feature-card h3 {
+            color: #f1f5f9;
+        }
+
+        body.dark .feature-card p {
+            color: #94a3b8;
+        }
+
+        body.dark .feature-card:hover {
+            border-color: #60a5fa;
+        }
+
+        body.dark .footer {
+            border-top-color: #334155;
+            color: #94a3b8;
+        }
+
+        .navbar {
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-button.login {
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .nav-button.login:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .nav-button.register {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .nav-button.register:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Переключатель темы */
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            background: inherit;
+        }
+
+        body.dark .theme-toggle {
+            border-color: #334155;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: #3b82f6;
+        }
+
+        .hero {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 32px;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .hero-button {
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .hero-button.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .hero-button.primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .hero-button.secondary {
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        .hero-button.secondary:hover {
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            flex: 1;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            border-radius: 30px;
+            padding: 40px;
+            color: white;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.5);
+        }
+
+        .features {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 0 24px;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="light">
+    <script>
+        // Если пользователь уже авторизован — перенаправляем в трекер
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            window.location.href = '/static/index.html';
+        }
+
+        // Переключение темы
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Загружаем сохранённую тему
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.classList.remove('dark', 'light');
+        body.classList.add(savedTheme);
+        if (themeToggle) themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    </script>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/static/landing.html" class="logo">Habit Tracker</a>
+            <div class="nav-actions">
+                <div class="nav-buttons">
+                    <a href="/static/login-page.html" class="nav-button login">Вход</a>
+                    <a href="/static/register-page.html" class="nav-button register">Регистрация</a>
+                </div>
+                <div class="theme-toggle" id="themeToggle" title="Сменить тему">
+                    🌙
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Формируй привычки, достигай целей</h1>
+            <p>Простой и удобный трекер, который поможет тебе закрепить полезные привычки всего за 40 дней.</p>
+            <div class="hero-buttons">
+                <a href="/static/register-page.html" class="hero-button primary">Начать бесплатно</a>
+                <a href="/static/login-page.html" class="hero-button secondary">Уже есть аккаунт</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            🔥 40 дней до новой привычки
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>Почему это работает</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Отслеживание прогресса</h3>
+                <p>Веди статистику выполнения, наблюдай за своей серией дней (streak).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Правило 40 дней</h3>
+                <p>Именно столько нужно, чтобы привычка закрепилась. Мы поможем дойти до цели.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌓</div>
+                <h3>Удобный интерфейс</h3>
+                <p>Тёмная и светлая темы, сортировка, фильтры — всё для комфортной работы.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2026 Habit Tracker. Проект для души.</p>
+    </footer>
+
+    <script>
+        // Переключение темы
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const bodyEl = document.body;
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (bodyEl.classList.contains('dark')) {
+                bodyEl.classList.remove('dark');
+                bodyEl.classList.add('light');
+                themeToggleBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                bodyEl.classList.remove('light');
+                bodyEl.classList.add('dark');
+                themeToggleBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+</body>
+</html>
